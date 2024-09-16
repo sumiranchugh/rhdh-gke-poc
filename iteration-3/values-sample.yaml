@@ -1,4 +1,6 @@
 global:
+  imagePullSecrets:
+    - rhdh-pull-secret
   host: rhdh.zapto.org
   dynamic:
     includes:
