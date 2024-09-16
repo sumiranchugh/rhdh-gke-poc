@@ -1,0 +1,8 @@
+apiVersion: networking.gke.io/v1
+kind: ManagedCertificate
+metadata:
+  name: rhdh-cert
+  namespace: rhdh-gke
+spec:
+  domains:
+    - rhdh.zapto.org

@@ -1,0 +1,24 @@
+global:
+  # TODO: Set your application domain name.
+  host: ${HOST}
+                         
+route:
+  enabled: false
+upstream:
+  postgresql:
+    enabled: true
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: gce
+      networking.gke.io/managed-certificates: ${GCP_MANAGED_CERT}
+  # tls:
+    # enabled: true
+    # secretName: tls-certs-secret 
+  backstage:      
+    image:
+      pullSecrets:
+      - ${IMAGE_PULL_SECRET}
+      registry: ${IMAGE_REGISTRY} #optional
+      repository: rhdh/rhdh-hub-rhel9 #optional
+      tag: latest #optional

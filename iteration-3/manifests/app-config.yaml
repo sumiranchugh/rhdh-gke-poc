@@ -1,0 +1,57 @@
+# app-config.yaml
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: app-config-rhdh
+data:
+  app-config-rhdh.yaml: |  
+    app:
+      title: Red Hat Developer Hub
+      baseUrl: https://rhdh.zapto.org
+    backend:
+      auth:
+        keys:
+          - secret: ${BACKEND_SECRET}
+      baseUrl: https://rhdh.zapto.org
+      cors:
+        origin: https://rhdh.zapto.org
+    auth:
+      environment: production
+      providers:
+        microsoft:
+          production:
+            clientId: ${AZURE_CLIENT_ID}
+            clientSecret: ${AZURE_CLIENT_SECRET}
+            tenantId: ${AZURE_TENANT_ID}
+    signInPage: microsoft       
+    catalog:
+      rules:
+        - allow: [Component, System, Group, Resource, Location, Template, API, User, Domain, Type]    
+      providers:        
+        microsoftGraphOrg:
+          providerId:
+            clientId: ${AZURE_CLIENT_ID}
+            clientSecret: ${AZURE_CLIENT_SECRET}
+            tenantId: ${AZURE_TENANT_ID}
+            user:
+              expand: manager
+            # userGroupMember:
+            #   filter: "displayName eq 'teama'"
+            group:
+              filter: "contains(displayName,'team')"
+            schedule:
+              frequency: PT1M
+              timeout: PT50M      
+    permission:
+      enabled: true 
+      rbac:
+        admin:
+          superUsers:
+            - name: user:default/sumiranchugh_outlook.com
+    enabled:
+        microsoftGraphOrg: true          
+    techdocs:
+      publisher:
+        type: 'googleGcs'
+        googleGcs:
+          bucketName: 'rhdh-bucket'                                                    

@@ -1,0 +1,25 @@
+global:
+  host: rhdh.zapto.org            
+route:
+  enabled: false
+upstream:
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: gce
+      networking.gke.io/managed-certificates: "rhdh-cert"
+    # tls:
+    #   enabled: true
+    #   secretName: tls-certs-secret  
+  backstage:      
+    image:
+      pullSecrets:
+      - rhdh-pull-secret
+      registry: registry.redhat.io #optional
+      repository: rhdh/rhdh-hub-rhel9 #optional
+      tag: "1.2" #optional
+    podSecurityContext:
+      # you can assign any random value as fsGroup
+      fsGroup: 2000  
+
+  

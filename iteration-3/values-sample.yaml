@@ -1,0 +1,64 @@
+global:
+  host: rhdh.zapto.org
+  dynamic:
+    includes:
+      - dynamic-plugins.default.yaml
+    plugins:
+      - package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-dynamic
+        disabled: true
+      - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes
+        disabled: true        
+      - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes-backend-dynamic
+        disabled: true  
+      - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-rbac
+        disabled: false
+      - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-topology
+        disabled: false
+      - package: ./dynamic-plugins/dist/backstage-plugin-techdocs-backend-dynamic
+        disabled: false 
+      - package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-msgraph-dynamic
+        disabled: false
+
+          
+                    
+route:
+  enabled: false
+upstream:
+  serviceAccount: 
+    name: devhub-sa
+    create: true
+    annotations:
+      iam.gke.io/gcp-service-account: rhdh-gsa@openenv-b4g6h.iam.gserviceaccount.com
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: gce
+      networking.gke.io/managed-certificates: "rhdh-cert"
+    # tls:
+    #   enabled: true
+    #   secretName: tls-certs-secret  
+  backstage:      
+    image:
+      pullSecrets:
+      - rhdh-pull-secret
+      registry: quay.io #optional
+      repository: rhdh/rhdh-hub-rhel9 #optional
+      tag: "1.3" #optional
+    podSecurityContext:
+      # you can assign any random value as fsGroup
+      fsGroup: 2000    
+    extraAppConfig:
+      - configMapRef: app-config-rhdh
+        filename: app-config-rhdh.yaml 
+    extraEnvVarsSecrets:
+      - rhdh-secret        
+    extraEnvVars:
+      - name: LOG_LEVEL
+        value: debug
+      - name: TZ
+        value: "Australia/Melbourne"  
+      - name: POSTGRESQL_ADMIN_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            key: postgres-password
+            name: rhdh-postgresql   
