@@ -1,6 +1,6 @@
 ### Iteration 2 
 
-Enable RHDH with external postgress running in Cloud Storage with workload identity
+Enable RHDH with Authentication and Authorization with workload identity
 
 PreReq:
 

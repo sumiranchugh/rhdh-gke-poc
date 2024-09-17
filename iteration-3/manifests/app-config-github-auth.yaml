@@ -1,0 +1,89 @@
+# app-config.yaml
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: app-config-rhdh
+data:
+  app-config-rhdh.yaml: |  
+    app:
+      title: Red Hat Developer Hub
+      baseUrl: https://rhdh.zapto.org
+    backend:
+      auth:
+        externalAccess:
+          - type: static
+            options:
+              token: ${BACKEND_SECRET}
+      baseUrl: https://rhdh.zapto.org
+      cors:
+        origin: https://rhdh.zapto.org
+    auth:
+      environment: production
+      providers:
+        github:
+          production:
+            clientId: ${GITHUB_APP_CLIENT_ID}
+            clientSecret: ${GITHUB_APP_CLIENT_SECRET}
+            ## uncomment if using GitHub Enterprise
+            # enterpriseInstanceUrl: ${GITHUB_URL}
+    signInPage: github
+    integrations:
+        github:
+          - host: github.com
+            apps:
+              - appId: ${GITHUB_APP_APP_ID}
+                clientId: ${GITHUB_APP_CLIENT_ID}
+                clientSecret: ${GITHUB_APP_CLIENT_SECRET}
+                webhookUrl: ${GITHUB_APP_WEBHOOK_URL}
+                webhookSecret: ${GITHUB_APP_WEBHOOK_SECRET}
+                privateKey: |
+                  ${GITHUB_APP_PRIVATE_KEY}       
+    catalog:
+      rules:
+        - allow: [Component, System, Group, Resource, Location, Template, API, User, Domain, Type]               
+      providers:
+        githubOrg:
+          id: production
+          githubUrl: https://github.com
+          orgs: [ "redhat-apac-stp" ]
+        github:
+            providerId:
+              organization: 'redhat-apac-stp'
+              schedule:
+                frequency:
+                  hours: 10
+                initialDelay:
+                  seconds: 15
+                timeout:
+                  minutes: 3        
+    permission:
+      enabled: true 
+      rbac:
+        admin:
+          superUsers:
+            - name: user:default/sumiranchugh_outlook.com
+            - name: user:default/sumiranchugh        
+    techdocs:
+      publisher:
+        type: 'googleGcs'
+        googleGcs:
+          bucketName: 'rhdh-bucket'
+    kubernetes:
+      serviceLocatorMethod:
+        type: 'singleTenant'
+      clusterLocatorMethods:  
+        - type: 'gke'
+          projectId: 'openenv-b4g6h'
+          exposeDashboard: true # optional
+          matchingResourceLabels: # optional
+            - key: 'environment'
+              value: 'sandbox'
+    # argocd:
+    #   appLocatorMethods:
+    #     - type: 'config'
+    #       instances:
+    #         - name: argoInstance1
+    #           url: https://argoInstance1.com
+    #           username: ${ARGOCD_USERNAME}
+    #           password: ${ARGOCD_PASSWORD}
+                                                             

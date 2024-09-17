@@ -28,14 +28,13 @@ upstream:
   serviceAccount: 
     name: devhub-sa
     create: true
+    annotations:
+      iam.gke.io/gcp-service-account: rhdh-gsa@openenv-b4g6h.iam.gserviceaccount.com
   ingress:
     enabled: true
     annotations:
       kubernetes.io/ingress.class: gce
       networking.gke.io/managed-certificates: "rhdh-cert"
-    # tls:
-    #   enabled: true
-    #   secretName: tls-certs-secret  
   backstage:      
     image:
       pullSecrets:

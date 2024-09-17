@@ -16,30 +16,32 @@ gcloud storage buckets add-iam-policy-binding gs://rhdh-bucket \
 --condition=None
 ```
 
+#### This does work but requires storage admin role
+
 ```
-gloud iam service-accounts create rhdh-gsa --display-name="RHDH GSA"
+gloud iam service-accounts create ${GSA} --display-name="RHDH GSA"
 ```
 
 add annotation to service account 
 
 ```
   serviceAccount: 
-    name: devhub-sa
+    name: ${KSA}
     create: true
     annotations:
-      iam.gke.io/gcp-service-account: rhdh-gsa@openenv-b4g6h.iam.gserviceaccount.com
+      iam.gke.io/gcp-service-account: ${GSA}@${PROJECT_ID}.iam.gserviceaccount.com
 ```
 
 ```
 gcloud iam service-accounts add-iam-policy-binding \
-rhdh-gsa@${PROJECT_ID}.iam.gserviceaccount.com \
+${GSA}@${PROJECT_ID}.iam.gserviceaccount.com \
   --role roles/iam.workloadIdentityUser
-  --member "serviceAccount.${PROJECT_ID}.svc.id.goog[${NAMESPACE}/{KSA}]"
+  --member "serviceAccount:${PROJECT_ID}.svc.id.goog[${NAMESPACE}/{KSA}]"
 
-gcloud iam service-accounts add-iam-policy-binding \
-rhdh-gsa@${PROJECT_ID}.iam.gserviceaccount.com \
-  --role roles/storage.objectUser
-  --member "serviceAccount.${PROJECT_ID}.svc.id.goog[${NAMESPACE}/{KSA}]"
+gcloud projects add-iam-policy-binding ${PROJECT_ID} \      
+    --member "serviceAccount:${GSA}@${PROJECT_ID}.iam.gserviceaccount.com" \
+    --role "roles/storageAdmin"       
+ 
 
 
  curl -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/?recursive=true
@@ -54,5 +56,5 @@ pluginConfig:
     publisher:
     type: 'googleGcs'
     googleGcs:
-        bucketName: 'rhdh-bucket'
+        bucketName: '${BUCKET}'
 ```              

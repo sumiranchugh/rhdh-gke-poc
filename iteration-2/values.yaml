@@ -1,24 +1,47 @@
 global:
-  # TODO: Set your application domain name.
   host: ${HOST}
-                         
+  dynamic:
+    includes:
+      - dynamic-plugins.default.yaml
+  plugins:
+    - package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-dynamic
+      disabled: true
+    - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes
+      disabled: true        
+    - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes-backend-dynamic
+      disabled: true  
+    - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-rbac
+      disabled: false
+    - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-topology
+      disabled: false
+    - package: ./dynamic-plugins/dist/backstage-plugin-techdocs-backend-dynamic
+      disabled: false
+      pluginConfig:
+        techdocs:
+          publisher:
+            type: 'googleGcs'
+            googleGcs:
+              bucketName: ${BUCKET}           
 route:
   enabled: false
 upstream:
-  postgresql:
-    enabled: true
+  serviceAccount: 
+    name: ${KSA}
+    create: true
+    annotations:
+      iam.gke.io/gcp-service-account: ${GSA}@${PROJECT_ID}.iam.gserviceaccount.com
   ingress:
     enabled: true
     annotations:
       kubernetes.io/ingress.class: gce
-      networking.gke.io/managed-certificates: ${GCP_MANAGED_CERT}
-  # tls:
-    # enabled: true
-    # secretName: tls-certs-secret 
+      networking.gke.io/managed-certificates: ${CERT}
   backstage:      
     image:
       pullSecrets:
-      - ${IMAGE_PULL_SECRET}
-      registry: ${IMAGE_REGISTRY} #optional
+      - rhdh-pull-secret
+      registry: registry.redhat.io #optional
       repository: rhdh/rhdh-hub-rhel9 #optional
-      tag: latest #optional
+      tag: "1.3-84" #optional
+    podSecurityContext:
+      # you can assign any random value as fsGroup
+      fsGroup: 2000    

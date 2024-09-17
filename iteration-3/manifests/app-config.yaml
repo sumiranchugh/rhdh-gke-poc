@@ -23,7 +23,13 @@ data:
             clientId: ${AZURE_CLIENT_ID}
             clientSecret: ${AZURE_CLIENT_SECRET}
             tenantId: ${AZURE_TENANT_ID}
-    signInPage: microsoft       
+        github:
+          production:
+            clientId: ${GITHUB_APP_CLIENT_ID}
+            clientSecret: ${GITHUB_APP_CLIENT_SECRET}
+            ## uncomment if using GitHub Enterprise
+            # enterpriseInstanceUrl: ${GITHUB_URL}    
+    # signInPage: github, microsoft       
     catalog:
       rules:
         - allow: [Component, System, Group, Resource, Location, Template, API, User, Domain, Type]    
@@ -35,10 +41,8 @@ data:
             tenantId: ${AZURE_TENANT_ID}
             user:
               expand: manager
-            # userGroupMember:
-            #   filter: "displayName eq 'teama'"
             group:
-              filter: "contains(displayName,'team')"
+              filter: "startswith(displayName,'team')"
             schedule:
               frequency: PT1M
               timeout: PT50M      
@@ -54,4 +58,14 @@ data:
       publisher:
         type: 'googleGcs'
         googleGcs:
-          bucketName: 'rhdh-bucket'                                                    
+          bucketName: 'rhdh-bucket'
+    kubernetes:
+      serviceLocatorMethod:
+        type: 'singleTenant'
+      clusterLocatorMethods:  
+        - type: 'gke'
+          projectId: 'openenv-b4g6h'
+          exposeDashboard: true # optional
+          matchingResourceLabels: # optional
+            - key: 'environment'
+              value: 'sandbox'                                                        

@@ -15,7 +15,7 @@ Steps
 ``` 
 helm install rhdh \
 openshift-helm-charts-ci-1.3/redhat-developer-hub  \
---version 1.2.3  \
 --namespace rhdh-gke \
 --values iteration-1/values-sample.yaml
+--devel
 ```

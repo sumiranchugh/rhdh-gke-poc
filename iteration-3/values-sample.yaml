@@ -6,12 +6,10 @@ global:
     includes:
       - dynamic-plugins.default.yaml
     plugins:
-      - package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-dynamic
-        disabled: true
       - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes
-        disabled: true        
+        disabled: false        
       - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes-backend-dynamic
-        disabled: true  
+        disabled: false  
       - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-rbac
         disabled: false
       - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-topology
@@ -20,19 +18,28 @@ global:
         disabled: false 
       - package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-msgraph-dynamic
         disabled: false
+      - disabled: false
+        package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-dynamic
+      - disabled: false
+        package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-org-dynamic    
 
           
                     
 route:
   enabled: false
 upstream:
+  service:
+    loadBalancerIP: 34.102.195.189
+    type: LoadBalancer
+    annotations: 
+      cloud.google.com/neg: '{"exposed_ports": {"7007":{"name": "neg"}}}'
   serviceAccount: 
     name: devhub-sa
     create: true
     annotations:
       iam.gke.io/gcp-service-account: rhdh-gsa@openenv-b4g6h.iam.gserviceaccount.com
   ingress:
-    enabled: true
+    enabled: false
     annotations:
       kubernetes.io/ingress.class: gce
       networking.gke.io/managed-certificates: "rhdh-cert"
