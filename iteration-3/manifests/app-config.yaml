@@ -29,7 +29,7 @@ data:
             clientSecret: ${GITHUB_APP_CLIENT_SECRET}
             ## uncomment if using GitHub Enterprise
             # enterpriseInstanceUrl: ${GITHUB_URL}    
-    # signInPage: github, microsoft       
+    signInPage: microsoft       
     catalog:
       rules:
         - allow: [Component, System, Group, Resource, Location, Template, API, User, Domain, Type]    
