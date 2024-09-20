@@ -15,21 +15,37 @@ data:
       baseUrl: https://rhdh.zapto.org
       cors:
         origin: https://rhdh.zapto.org
+    integrations:
+      github:
+        - host: github.com
+          apps:
+            - appId: ${GITHUB_APP_APP_ID}
+              clientId: ${GITHUB_APP_CLIENT_ID}
+              clientSecret: ${GITHUB_APP_CLIENT_SECRET}
+              webhookUrl: ${GITHUB_APP_WEBHOOK_URL}
+              webhookSecret: ${GITHUB_APP_WEBHOOK_SECRET}
+              privateKey: |
+                ${GITHUB_APP_PRIVATE_KEY}                  
     auth:
-      environment: production
       providers:
         microsoft:
-          production:
+          development:
             clientId: ${AZURE_CLIENT_ID}
             clientSecret: ${AZURE_CLIENT_SECRET}
             tenantId: ${AZURE_TENANT_ID}
+            providers:
         github:
-          production:
+          development:
             clientId: ${GITHUB_APP_CLIENT_ID}
             clientSecret: ${GITHUB_APP_CLIENT_SECRET}
             ## uncomment if using GitHub Enterprise
-            # enterpriseInstanceUrl: ${GITHUB_URL}    
-    signInPage: microsoft       
+            # enterpriseInstanceUrl: ${GITHUB_URL}         
+    signInPage: microsoft
+    scaffolder:
+      defaultAuthor:
+        name: S.C # Defaults to `Scaffolder`
+        email: suchugh@redhat.com # Defaults to `scaffolder@backstage.io`
+      defaultCommitMessage: "U can't touch this" # Defaults to 'Initial commit'     
     catalog:
       rules:
         - allow: [Component, System, Group, Resource, Location, Template, API, User, Domain, Type]    
@@ -45,13 +61,29 @@ data:
               filter: "startswith(displayName,'team')"
             schedule:
               frequency: PT1M
-              timeout: PT50M      
+              timeout: PT50M
+        githubOrg:
+          id: production
+          githubUrl: https://github.com
+          orgs: [ "redhat-apac-stp" ]
+        github:
+            providerId:
+              organization: 'redhat-apac-stp'
+              schedule:
+                frequency:
+                  hours: 10
+                initialDelay:
+                  seconds: 15
+                timeout:
+                  minutes: 3              
     permission:
       enabled: true 
       rbac:
         admin:
           superUsers:
             - name: user:default/sumiranchugh_outlook.com
+            - name: user:default/sumiranchugh
+            - name: user:default/user1_sumiranchughoutlook.onmicrosoft.com  
     enabled:
         microsoftGraphOrg: true          
     techdocs:

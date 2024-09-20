@@ -21,7 +21,11 @@ global:
       - disabled: false
         package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-dynamic
       - disabled: false
-        package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-org-dynamic    
+        package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-org-dynamic
+      - package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-github-dynamic
+        disabled: false
+      - package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-github-pull-requests
+        disabled: false
 
           
                     
@@ -29,10 +33,13 @@ route:
   enabled: false
 upstream:
   service:
-    loadBalancerIP: 34.102.195.189
+    ports:
+      backend: 443
     type: LoadBalancer
+    externalTrafficPolicy: Local
     annotations: 
-      cloud.google.com/neg: '{"exposed_ports": {"7007":{"name": "neg"}}}'
+      cloud.google.com/l4-rbs: "enabled"
+    #   cloud.google.com/neg: '{"exposed_ports": {"7007":{"name": "neg"}}}'
   serviceAccount: 
     name: devhub-sa
     create: true
@@ -45,7 +52,10 @@ upstream:
       networking.gke.io/managed-certificates: "rhdh-cert"
     # tls:
     #   enabled: true
-    #   secretName: tls-certs-secret  
+    #   secretName: tls-certs-secret
+  appConfig:
+    backend:
+      https: true    
   backstage:      
     image:
       pullSecrets:
@@ -62,8 +72,8 @@ upstream:
     extraEnvVarsSecrets:
       - rhdh-secret        
     extraEnvVars:
-      - name: LOG_LEVEL
-        value: debug
+      # - name: LOG_LEVEL
+      #   value: debug
       - name: TZ
         value: "Australia/Melbourne"  
       - name: POSTGRESQL_ADMIN_PASSWORD
@@ -71,3 +81,9 @@ upstream:
           secretKeyRef:
             key: postgres-password
             name: rhdh-postgresql   
+    livenessProbe:
+      httpGet:
+        scheme: HTTPS 
+    readinessProbe:
+      httpGet:
+        scheme: HTTPS            

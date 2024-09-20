@@ -1,0 +1,156 @@
+global:
+  imagePullSecrets:
+    - rhdh-pull-secret
+  host: rhdh.zapto.org
+  dynamic:
+    includes:
+      - dynamic-plugins.default.yaml
+    plugins:
+      - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes
+        disabled: false        
+      - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes-backend-dynamic
+        disabled: false  
+      - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-rbac
+        disabled: false
+      - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-topology
+        disabled: false
+      - package: ./dynamic-plugins/dist/backstage-plugin-techdocs-backend-dynamic
+        disabled: false 
+      - package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-msgraph-dynamic
+        disabled: false
+      - disabled: false
+        package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-dynamic
+      - disabled: false
+        package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-org-dynamic 
+      - disabled: false
+        package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-github-dynamic
+      - disabled: false
+        package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-github-pull-requests
+
+
+          
+                    
+route:
+  enabled: false
+  
+upstream:
+  postgresql:
+    enabled: false
+
+  service:
+    ports:
+      backend: 443
+    type: LoadBalancer
+    externalTrafficPolicy: Local
+    annotations: 
+      cloud.google.com/l4-rbs: "enabled"
+    #   cloud.google.com/neg: '{"exposed_ports": {"7007":{"name": "neg"}}}'
+  serviceAccount: 
+    name: devhub-sa
+    create: true
+    annotations:
+      iam.gke.io/gcp-service-account: rhdh-gsa@openenv-b4g6h.iam.gserviceaccount.com                     
+  backstage:
+    appConfig:
+      backend:
+        https: true
+          # certificate:
+          #   key: ${BACKSTAGE_SSL_KEY} # key in pem format 
+          #   cert: ${BACKSTAGE_SSL_CERT} # cert in pem format 
+        database:
+          client: pg
+          ensureExists: true
+          pluginDivisionMode: 'schema'
+          knexConfig:
+            searchPath: ['knex', 'public']
+          connection:
+            host: '127.0.0.1'
+            port: '5432'
+            user: ${DB_USER}
+            password: ${DB_PASSWORD}
+          # prefix: devhub_plugin_
+          plugin:
+            permission:
+              connection: 
+                database: devhub_plugin_permission
+            kubernetes:
+              connection: 
+                database: devhub_plugin_kubernetes                     
+            scalprum:
+              connection: 
+                database: devhub_plugin_scalprum 
+            licensed-users-info:
+              connection: 
+                database: devhub_plugin_licensed-users-info          
+            techdocs:
+              connection: 
+                database: devhub_plugin_techdocs        
+            events:
+              connection: 
+                database: devhub_plugin_events          
+            search:
+              connection: 
+                database: devhub_plugin_search
+            scaffolder:
+              connection: 
+                database: devhub_plugin_scaffolder
+            proxy:
+              connection: 
+                database: devhub_plugin_proxy
+            auth:
+              connection: 
+                database: devhub_plugin_auth
+            catalog:
+              connection:
+                database: devhub_plugin_catalog
+            app:
+              connection: 
+                database: devhub_plugin_auth
+            dynamic-plugins-info: 
+              connection: 
+                database: devhub_plugin_dynamic-plugins-info       
+    image:
+      pullPolicy: IfNotPresent
+      pullSecrets:
+      - rhdh-pull-secret
+      registry: quay.io #optional
+      repository: rhdh/rhdh-hub-rhel9 #optional
+      tag: "1.3" #optional
+    podSecurityContext:
+      # you can assign any random value as fsGroup
+      fsGroup: 2000    
+    extraAppConfig:
+      - configMapRef: app-config-rhdh
+        filename: app-config-rhdh.yaml 
+    extraEnvVarsSecrets:
+      - rhdh-secret        
+    extraEnvVars:
+      # - name: LOG_LEVEL
+      #   value: debug
+      - name: TZ
+        value: "Australia/Melbourne"  
+      # - name: POSTGRESQL_ADMIN_PASSWORD
+      #   valueFrom:
+      #     secretKeyRef:
+      #       key: postgres-password
+      #       name: rhdh-postgresql   
+    livenessProbe:
+      httpGet:
+        scheme: HTTPS 
+    readinessProbe:
+      httpGet:
+        scheme: HTTPS
+    extraContainers:
+      - name: cloud-sql-proxy
+        image: gcr.io/cloud-sql-connectors/cloud-sql-proxy
+        args:
+          - "--structured-logs"
+          - "--port=5432"
+          - "openenv-b4g6h:australia-southeast2:devhub-db"
+        securityContext:
+          runAsNonRoot: true
+
+
+
+    
+                        

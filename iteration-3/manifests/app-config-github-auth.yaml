@@ -8,7 +8,19 @@ data:
     app:
       title: Red Hat Developer Hub
       baseUrl: https://rhdh.zapto.org
+    backstage:
+      appConfig:
+        app:
+          # Let's test that everything is fine with comments
+          title: The very best Backstage Helm Chart! :D
+          baseUrl: https://somedomain.tl
+        backend:
+          baseUrl: https://somedomain.tl
+          listen:
+            port: 12345
+  
     backend:
+      https: true
       auth:
         externalAccess:
           - type: static
@@ -20,6 +32,7 @@ data:
     auth:
       environment: production
       providers:
+        guest: {}
         github:
           production:
             clientId: ${GITHUB_APP_CLIENT_ID}
@@ -28,16 +41,16 @@ data:
             # enterpriseInstanceUrl: ${GITHUB_URL}
     signInPage: github
     integrations:
-        github:
-          - host: github.com
-            apps:
-              - appId: ${GITHUB_APP_APP_ID}
-                clientId: ${GITHUB_APP_CLIENT_ID}
-                clientSecret: ${GITHUB_APP_CLIENT_SECRET}
-                webhookUrl: ${GITHUB_APP_WEBHOOK_URL}
-                webhookSecret: ${GITHUB_APP_WEBHOOK_SECRET}
-                privateKey: |
-                  ${GITHUB_APP_PRIVATE_KEY}       
+      github:
+        - host: github.com
+          apps:
+            - appId: ${GITHUB_APP_APP_ID}
+              clientId: ${GITHUB_APP_CLIENT_ID}
+              clientSecret: ${GITHUB_APP_CLIENT_SECRET}
+              webhookUrl: none
+              webhookSecret: none
+              privateKey: |
+                ${GITHUB_APP_PRIVATE_KEY}       
     catalog:
       rules:
         - allow: [Component, System, Group, Resource, Location, Template, API, User, Domain, Type]               
