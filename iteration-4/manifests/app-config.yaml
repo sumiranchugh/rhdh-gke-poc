@@ -6,7 +6,7 @@ metadata:
 data:
   app-config-rhdh.yaml: |  
     app:
-      title: Red Hat Developer Hub
+      title: Sandbox
       baseUrl: https://rhdh.zapto.org
     backend:
       auth:
@@ -85,13 +85,17 @@ data:
     permission:
       enabled: true 
       rbac:
+        policyFileReload: true
+        policies-csv-file: /opt/app-root/src/rbac-policy.csv
+        conditionalPoliciesFile: /some/path/conditional-policies.yaml
         admin:
           superUsers:
             - name: user:default/sumiranchugh_outlook.com
             - name: user:default/sumiranchugh
             - name: user:default/user1_sumiranchughoutlook.onmicrosoft.com
             - name: group:default/teamb
-            - name: user:default/user5_sumiranchughoutlook.onmicrosoft.com  
+            - name: user:default/user5_sumiranchughoutlook.onmicrosoft.com
+            - name: user:default/abc_gmail.com 
     enabled:
         microsoftGraphOrg: true          
     techdocs:
@@ -105,10 +109,7 @@ data:
       clusterLocatorMethods:  
         - type: 'gke'
           projectId: 'openenv-b4g6h'
-          exposeDashboard: true # optional
-          matchingResourceLabels: # optional
-            - key: 'environment'
-              value: 'sandbox'
+          exposeDashboard: true 
     argocd:
       appLocatorMethods:
         - type: 'config'
@@ -117,20 +118,26 @@ data:
               url: https://proxy-rhdh.zapto.org
               username: ${ARGOCD_USERNAME}
               password: ${ARGOCD_PASSWORD}          
-    # proxy:
-    #   endpoints:
-    #     msonline:
-    #       target: https://10.0.0.9
-    #       credentials: forward
-    #       changeOrigin: false
-    #       headers:
-    #         host: https://login.microsoftonline.com
-    #       #   Authorization: fbf92892853a844f58e43eb02b8a5f1ddfc702af
-    #     graph:
-    #       target: https://10.0.0.9
-    #       credentials: forward
-    #       changeOrigin: false
-    #       headers:
-    #         host: https://graph.microsoft.com
-    #       #   Authorization: fbf92892853a844f58e43eb02b8a5f1ddfc702af        
+    proxy:
+      endpoints:
+        '/developer-hub':
+          target: https://raw.githubusercontent.com/
+          pathRewrite:
+            '^/api/proxy/developer-hub': /sumiranchugh/rhdh-gke-poc/refs/heads/main/iteration-4/manifests/data.json
+          changeOrigin: true
+          secure: false    
+        # '/msonline':
+        # target: https://10.0.0.9
+        # credentials: forward
+        # changeOrigin: false
+        # headers:
+        #   host: https://login.microsoftonline.com
+        #   #   Authorization: fbf92892853a844f58e43eb02b8a5f1ddfc702af
+        # '/graph':
+        # target: https://10.0.0.9
+        # credentials: forward
+        # changeOrigin: false
+        # headers:
+        #   host: https://graph.microsoft.com
+        # #   Authorization: fbf92892853a844f58e43eb02b8a5f1ddfc702af        
 

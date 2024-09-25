@@ -54,8 +54,9 @@ Steps
 ```
 pluginConfig:
   techdocs:
+    builder: external
     publisher:
-    type: 'googleGcs'
-    googleGcs:
+      type: 'googleGcs'
+      googleGcs:
         bucketName: '${BUCKET}'
 ```              

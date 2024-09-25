@@ -1,6 +1,6 @@
 ### Iteration 2 
 
-Enable RHDH with Authentication and Authorization with workload identity
+Enable RHDH with CloudSQL with workload identity
 
 PreReq:
 

@@ -1,0 +1,71 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: rbac-policy
+data:
+  rbac-policy.csv: |
+    # Admin Role
+    # Catalog permissions
+    p, role:default/admins, catalog.entity.read, read, allow
+    p, role:default/admins, catalog.entity.create, create, allow
+    p, role:default/admins, catalog.entity.refresh, update, allow
+    p, role:default/admins, catalog.entity.delete, delete, allow
+    p, role:default/admins, catalog.location.read, read, allow
+    p, role:default/admins, catalog.location.create, create, allow
+    p, role:default/admins, catalog.location.delete, delete, allow
+    # Scaffolder permissions
+    p, role:default/admins, scaffolder.action.execute, use, allow
+    p, role:default/admins, scaffolder.template.parameter.read, read, allow
+    p, role:default/admins, scaffolder.template.step.read, read, allow
+    p, role:default/admins, scaffolder.task.create, create, allow
+    p, role:default/admins, scaffolder.task.cancel, use, allow
+    p, role:default/admins, scaffolder.task.read, read, allow
+    # RBAC permissions
+    p, role:default/admins, policy.entity.read, read, allow
+    p, role:default/admins, policy.entity.create, create, allow
+    p, role:default/admins, policy.entity.update, update, allow
+    p, role:default/admins, policy.entity.delete, delete, allow
+    # Kubernetes permissions
+    p, role:default/admins, kubernetes.proxy, use, allow
+    # OCM permissions
+    p, role:default/admins, ocm.entity.read, read, allow
+    p, role:default/admins, ocm.cluster.read, read, allow
+    # Topology permissions
+    p, role:default/admins, topology.view.read, read, allow
+
+    # Admin User
+    # this is not needed now with the new superUser setting
+    g, user:default/user5_sumiranchughoutlook.onmicrosoft.com, role:default/admins
+
+    # teama Role
+    # Catalog permissions
+    p, role:default/teama, catalog.entity.read, read, allow
+    p, role:default/teama, catalog.entity.create, create, allow
+    p, role:default/teama, catalog.entity.refresh, update, allow
+    p, role:default/teama, catalog.entity.delete, delete, allow
+    p, role:default/teama, catalog.location.read, read, allow
+    p, role:default/teama, catalog.location.create, create, allow
+    p, role:default/teama, catalog.location.delete, delete, allow
+    # Scaffolder permissions
+    p, role:default/teama, scaffolder.action.execute, use, allow
+    p, role:default/teama, scaffolder.template.parameter.read, read, allow
+    p, role:default/teama, scaffolder.template.step.read, read, allow
+    p, role:default/teama, scaffolder.task.create, create, allow
+    p, role:default/teama, scaffolder.task.cancel, use, allow
+    p, role:default/teama, scaffolder.task.read, read, allow
+    # RBAC permissions
+    p, role:default/teama, policy.entity.read, read, allow
+    p, role:default/teama, policy.entity.create, create, allow
+    p, role:default/teama, policy.entity.update, update, allow
+    p, role:default/teama, policy.entity.delete, delete, allow
+    # Kubernetes permissions
+    #p, role:default/teama, kubernetes.proxy, use, allow
+    # Topology permissions
+    #p, role:default/teama, topology.view.read, read, allow
+
+    # teamb Role
+    p, role:default/teamb, catalog.entity.read, read, deny
+
+    # Groups
+    g, group:default/teama, role:default/teama
+    g, group:default/teamb, role:default/teamb

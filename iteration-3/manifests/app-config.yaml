@@ -52,9 +52,9 @@ data:
         email: suchugh@redhat.com # Defaults to `scaffolder@backstage.io`
       defaultCommitMessage: "U can't touch this" # Defaults to 'Initial commit'     
     catalog:
-      locations:
-        - type: file
-          target: <github url to file path>
+      # locations:
+      #   - type: file
+      #     target: <github url to file path>
       rules:
         - allow: [Component, System, Group, Resource, Location, Template, API, User, Domain, Type]    
       providers:        
