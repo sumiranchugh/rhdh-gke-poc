@@ -1,5 +1,5 @@
 global:
-  host: rhdh.zapto.org
+  host: ${HOST}
   dynamic:
     includes:
       - dynamic-plugins.default.yaml
@@ -21,7 +21,7 @@ global:
           publisher:
             type: 'googleGcs'
             googleGcs:
-              bucketName: 'rhdh-bucket'           
+              bucketName: '${BUCKET}'           
 route:
   enabled: false
 upstream:
@@ -29,12 +29,12 @@ upstream:
     name: devhub-sa
     create: true
     annotations:
-      iam.gke.io/gcp-service-account: rhdh-gsa@openenv-b4g6h.iam.gserviceaccount.com
+      iam.gke.io/gcp-service-account: ${GSA}@${PROJECT_ID}.iam.gserviceaccount.com
   ingress:
     enabled: true
     annotations:
       kubernetes.io/ingress.class: gce
-      networking.gke.io/managed-certificates: "rhdh-cert"
+      networking.gke.io/managed-certificates: ${MANAGED_CERT_NAME}
   backstage:      
     image:
       pullSecrets:

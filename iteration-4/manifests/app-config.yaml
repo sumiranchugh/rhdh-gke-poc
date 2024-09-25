@@ -31,10 +31,11 @@ data:
       providers:
         microsoft:
           development:
+            # target: https://rhdh.zapto.org:7007/api/proxy/graph 
+            # authority: https://rhdh.zapto.org:7007/api/proxy/msonline 
             clientId: ${AZURE_CLIENT_ID}
             clientSecret: ${AZURE_CLIENT_SECRET}
             tenantId: ${AZURE_TENANT_ID}
-            providers:
         github:
           development:
             clientId: ${GITHUB_APP_CLIENT_ID}
@@ -52,9 +53,6 @@ data:
         email: suchugh@redhat.com # Defaults to `scaffolder@backstage.io`
       defaultCommitMessage: "U can't touch this" # Defaults to 'Initial commit'     
     catalog:
-      locations:
-        - type: file
-          target: <github url to file path>
       rules:
         - allow: [Component, System, Group, Resource, Location, Template, API, User, Domain, Type]    
       providers:        
@@ -91,14 +89,16 @@ data:
           superUsers:
             - name: user:default/sumiranchugh_outlook.com
             - name: user:default/sumiranchugh
-            - name: user:default/user1_sumiranchughoutlook.onmicrosoft.com  
+            - name: user:default/user1_sumiranchughoutlook.onmicrosoft.com
+            - name: group:default/teamb
+            - name: user:default/user5_sumiranchughoutlook.onmicrosoft.com  
     enabled:
         microsoftGraphOrg: true          
     techdocs:
       publisher:
         type: 'googleGcs'
         googleGcs:
-          bucketName: 'rhdh-bucket'
+          bucketName: 'devhub-bucket'
     kubernetes:
       serviceLocatorMethod:
         type: 'singleTenant'
@@ -109,16 +109,28 @@ data:
           matchingResourceLabels: # optional
             - key: 'environment'
               value: 'sandbox'
-    proxy:
-      endpoints:
-        login.microsoftonline.com:
-          target: https://proxytest:8080
-          credentials: forward
-          headers:
-            Authorization: fbf92892853a844f58e43eb02b8a5f1ddfc702af
-        graph.microsoft.com:
-          target: https://proxytest:8080
-          credentials: forward
-          headers:
-            Authorization: fbf92892853a844f58e43eb02b8a5f1ddfc702af        
+    argocd:
+      appLocatorMethods:
+        - type: 'config'
+          instances:
+            - name: argoInstance1
+              url: https://proxy-rhdh.zapto.org
+              username: ${ARGOCD_USERNAME}
+              password: ${ARGOCD_PASSWORD}          
+    # proxy:
+    #   endpoints:
+    #     msonline:
+    #       target: https://10.0.0.9
+    #       credentials: forward
+    #       changeOrigin: false
+    #       headers:
+    #         host: https://login.microsoftonline.com
+    #       #   Authorization: fbf92892853a844f58e43eb02b8a5f1ddfc702af
+    #     graph:
+    #       target: https://10.0.0.9
+    #       credentials: forward
+    #       changeOrigin: false
+    #       headers:
+    #         host: https://graph.microsoft.com
+    #       #   Authorization: fbf92892853a844f58e43eb02b8a5f1ddfc702af        
 

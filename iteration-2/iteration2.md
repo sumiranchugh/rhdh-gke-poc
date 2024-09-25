@@ -19,7 +19,7 @@ gcloud storage buckets add-iam-policy-binding gs://rhdh-bucket \
 #### This does work but requires storage admin role
 
 ```
-gloud iam service-accounts create ${GSA} --display-name="RHDH GSA"
+gcloud iam service-accounts create ${GSA} --display-name="RHDH GSA"
 ```
 
 add annotation to service account 
@@ -35,12 +35,13 @@ add annotation to service account
 ```
 gcloud iam service-accounts add-iam-policy-binding \
 ${GSA}@${PROJECT_ID}.iam.gserviceaccount.com \
-  --role roles/iam.workloadIdentityUser
-  --member "serviceAccount:${PROJECT_ID}.svc.id.goog[${NAMESPACE}/{KSA}]"
+  --role roles/iam.workloadIdentityUser \
+  --member "serviceAccount:${PROJECT_ID}.svc.id.goog[${NAMESPACE}/${KSA}]"
 
-gcloud projects add-iam-policy-binding ${PROJECT_ID} \      
-    --member "serviceAccount:${GSA}@${PROJECT_ID}.iam.gserviceaccount.com" \
-    --role "roles/storageAdmin"       
+
+gcloud storage buckets create gs://devhub-bucket  
+
+gcloud storage buckets add-iam-policy-binding gs://devhub-bucket --member "serviceAccount:${GSA}@${PROJECT_ID}.iam.gserviceaccount.com" --role "roles/storage.objectAdmin"       
  
 
 

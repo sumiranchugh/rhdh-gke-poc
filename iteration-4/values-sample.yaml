@@ -9,7 +9,15 @@ global:
       - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes
         disabled: false        
       - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes-backend-dynamic
-        disabled: false  
+        disabled: false 
+      - package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-argo-cd-backend-dynamic
+        disabled: false
+      # - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-argocd
+      #   disabled: false
+      - package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-argo-cd
+        disabled: false
+      - package: 	./dynamic-plugins/dist/roadiehq-scaffolder-backend-argocd-dynamic
+        disabled: false         
       - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-rbac
         disabled: false
       - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-topology
@@ -22,7 +30,7 @@ global:
         package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-dynamic
       - disabled: false
         package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-org-dynamic 
-      - disabled: false
+      - disabled: true
         package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-github-dynamic
       - disabled: false
         package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-github-pull-requests
@@ -49,7 +57,7 @@ upstream:
     name: devhub-sa
     create: true
     annotations:
-      iam.gke.io/gcp-service-account: rhdh-gsa@openenv-b4g6h.iam.gserviceaccount.com                     
+      iam.gke.io/gcp-service-account: rhdh-gsa@openenv-lhwpr.iam.gserviceaccount.com                     
   backstage:
     appConfig:
       backend:
@@ -59,56 +67,16 @@ upstream:
           #   cert: ${BACKSTAGE_SSL_CERT} # cert in pem format 
         database:
           client: pg
-          ensureExists: true
-          pluginDivisionMode: 'schema'
-          knexConfig:
-            searchPath: ['knex', 'public']
+          # ensureExists: true
+          # pluginDivisionMode: 'schema'
+          # knexConfig:
+          #   searchPath: ['knex', 'public']
           connection:
             host: '127.0.0.1'
             port: '5432'
             user: ${DB_USER}
             password: ${DB_PASSWORD}
-          # prefix: devhub_plugin_
-          plugin:
-            permission:
-              connection: 
-                database: devhub_plugin_permission
-            kubernetes:
-              connection: 
-                database: devhub_plugin_kubernetes                     
-            scalprum:
-              connection: 
-                database: devhub_plugin_scalprum 
-            licensed-users-info:
-              connection: 
-                database: devhub_plugin_licensed-users-info          
-            techdocs:
-              connection: 
-                database: devhub_plugin_techdocs        
-            events:
-              connection: 
-                database: devhub_plugin_events          
-            search:
-              connection: 
-                database: devhub_plugin_search
-            scaffolder:
-              connection: 
-                database: devhub_plugin_scaffolder
-            proxy:
-              connection: 
-                database: devhub_plugin_proxy
-            auth:
-              connection: 
-                database: devhub_plugin_auth
-            catalog:
-              connection:
-                database: devhub_plugin_catalog
-            app:
-              connection: 
-                database: devhub_plugin_auth
-            dynamic-plugins-info: 
-              connection: 
-                database: devhub_plugin_dynamic-plugins-info       
+          prefix: devhub_plugin_   
     image:
       pullPolicy: IfNotPresent
       pullSecrets:
@@ -125,10 +93,18 @@ upstream:
     extraEnvVarsSecrets:
       - rhdh-secret        
     extraEnvVars:
-      # - name: LOG_LEVEL
-      #   value: debug
+      - name: LOG_LEVEL
+        value: debug
       - name: TZ
-        value: "Australia/Melbourne"  
+        value: "Australia/Melbourne"
+      # - name: HTTPS_PROXY
+      #   value: https://10.0.0.9  
+      # - name: GLOBAL_AGENT_HTTP_PROXY
+      #   value: http://10.0.0.9         
+      # - name: GLOBAL_AGENT_NO_PROXY
+      #   value: localhost
+      # - name: GLOBAL_AGENT_HTTPS_PROXY
+      #   value: https://10.0.0.9           
       # - name: POSTGRESQL_ADMIN_PASSWORD
       #   valueFrom:
       #     secretKeyRef:
@@ -146,7 +122,7 @@ upstream:
         args:
           - "--structured-logs"
           - "--port=5432"
-          - "openenv-b4g6h:australia-southeast2:devhub-db"
+          - "openenv-lhwpr:australia-southeast2:devhub"
         securityContext:
           runAsNonRoot: true
 
