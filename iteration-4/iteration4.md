@@ -95,30 +95,18 @@ data:
         result: CONDITIONAL
         roleEntityRef: 'role:default/test'
         pluginId: catalog
-        resourceType: catalog-entity
         permissionMapping:
         - read
         - update
-        conditions:
-        rule: IS_ENTITY_OWNER
         resourceType: catalog-entity
-        params:
+
+        conditions:
+          rule: IS_ENTITY_OWNER
+          resourceType: catalog-entity
+          params:
             claims:
             - 'group:default/teama'
             - 'group:default/teamb'
-        ---
-        result: CONDITIONAL
-        roleEntityRef: 'role:default/test'
-        pluginId: catalog
-        resourceType: catalog-entity
-        permissionMapping:
-        - delete
-        conditions:
-        rule: IS_ENTITY_OWNER
-        resourceType: catalog-entity
-        params:
-            claims:
-            - 'group:default/teama'
 ```
 
 
