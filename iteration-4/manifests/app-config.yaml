@@ -87,7 +87,7 @@ data:
       rbac:
         policyFileReload: true
         policies-csv-file: /opt/app-root/src/rbac-policy.csv
-        conditionalPoliciesFile: /some/path/conditional-policies.yaml
+        conditionalPoliciesFile: /opt/app-root/src/conditional-policy.yaml
         admin:
           superUsers:
             - name: user:default/sumiranchugh_outlook.com
