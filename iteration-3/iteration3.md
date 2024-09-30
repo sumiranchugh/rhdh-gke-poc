@@ -11,3 +11,7 @@ PreReq:
 
 Steps
 - Update `upstream.postgress.enabled=false`
+- add sidecar for cloud-sql-pro
+```
+gcloud projects add-iam-policy-binding ${PROJECT_ID}  --member "serviceAccount:${GSA}@${PROJECT_ID}.iam.gserviceaccount.com" --role "roles/cloudsql.client"
+```
