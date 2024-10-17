@@ -1,5 +1,13 @@
+env:
+  PROJECT_ID: openenv-gzl5j
+  PROJECT_NUMBER: 1045819040978
+  NAMESPACE: rhdh-gke
+  KSA: devhub-sa
+  GSA: rhdh-gsa
+  BUCKET: rhdh-bucket
+  MANAGED_CERT_NAME: rhdh-cert  
 global:
-  host: ${HOST}
+  host: rhdh.zapto.org
   dynamic:
     includes:
       - dynamic-plugins.default.yaml
@@ -15,33 +23,50 @@ global:
     - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-topology
       disabled: false
     - package: ./dynamic-plugins/dist/backstage-plugin-techdocs-backend-dynamic
-      disabled: false
-      pluginConfig:
-        techdocs:
-          publisher:
-            type: 'googleGcs'
-            googleGcs:
-              bucketName: '${BUCKET}'           
+      disabled: false          
 route:
   enabled: false
 upstream:
   serviceAccount: 
-    name: devhub-sa
+    name: 'devhub-sa'
     create: true
     annotations:
-      iam.gke.io/gcp-service-account: ${GSA}@${PROJECT_ID}.iam.gserviceaccount.com
+      iam.gke.io/gcp-service-account: 'rhdh-gsa@openenv-gzl5j.iam.gserviceaccount.com'
   ingress:
     enabled: true
     annotations:
       kubernetes.io/ingress.class: gce
-      networking.gke.io/managed-certificates: ${MANAGED_CERT_NAME}
+      networking.gke.io/managed-certificates: rhdh-cert
   backstage:      
     image:
       pullSecrets:
       - rhdh-pull-secret
       registry: registry.redhat.io #optional
       repository: rhdh/rhdh-hub-rhel9 #optional
-      tag: "1.3-84" #optional
+      tag: "1.3" #optional
     podSecurityContext:
       # you can assign any random value as fsGroup
-      fsGroup: 2000    
+      fsGroup: 2000
+    appConfig:
+      # backend:
+      #   https: false
+      auth:
+        environment: development
+        providers:
+          guest:
+            dangerouslyAllowOutsideDevelopment: true
+      techdocs:
+        # builder: external
+        publisher:
+          type: 'googleGcs'
+          googleGcs:
+            bucketName: 'rhdh-bucket'             
+  postgresql:
+    primary:
+      podSecurityContext:
+        enabled: true
+        # you can assign any random value as fsGroup
+        fsGroup: 3000 
+
+          
+    

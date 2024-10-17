@@ -3,23 +3,34 @@ global:
 route:
   enabled: false
 upstream:
+  appConfig:
+    backend:
+      https: true 
+    auth:
+      environment: development
+      providers:
+        guest:
+          dangerouslyAllowOutsideDevelopment: true      
   ingress:
     enabled: true
     annotations:
       kubernetes.io/ingress.class: gce
-      networking.gke.io/managed-certificates: "rhdh-cert"
-    # tls:
-    #   enabled: true
-    #   secretName: tls-certs-secret  
+      networking.gke.io/managed-certificates: "rhdh-cert" 
   backstage:      
     image:
       pullSecrets:
       - rhdh-pull-secret
       registry: registry.redhat.io #optional
       repository: rhdh/rhdh-hub-rhel9 #optional
-      tag: "1.2" #optional
+      tag: "1.3" #optional
     podSecurityContext:
       # you can assign any random value as fsGroup
-      fsGroup: 2000  
+      fsGroup: 2000 
+  postgresql:
+    primary:
+      podSecurityContext:
+        enabled: true
+        # you can assign any random value as fsGroup
+        fsGroup: 3000     
 
   
