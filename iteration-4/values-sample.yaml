@@ -79,7 +79,7 @@ upstream:
             port: '5432'
             user: ${DB_USER}
             password: ${DB_PASSWORD}
-          prefix: devhub_plugin_ 
+          prefix: backstage_demo_
     extraAppConfig:
       - configMapRef: app-config-rhdh
         filename: app-config-rhdh.yaml
