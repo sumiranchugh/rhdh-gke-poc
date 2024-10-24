@@ -7,7 +7,7 @@ global:
       - dynamic-plugins.default.yaml
     plugins:    
     - package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-dynamic
-      disabled: false
+      disabled: true
     - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-rbac
       disabled: false
     - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-topology
@@ -50,7 +50,10 @@ upstream:
       fsGroup: 2000
     appConfig:
       backend:
-        https: true
+        https: 
+          certificate:
+            key: ${BACKSTAGE_SSL_KEY} # key in pem format 
+            cert: ${BACKSTAGE_SSL_CERT} # cert in pem format   
         database:
           client: pg
           # ensureExists: false
@@ -62,7 +65,7 @@ upstream:
             port: '5432'
             user: ${DB_USER}
             password: ${DB_PASSWORD}
-          prefix: devhub_plugin_ 
+          prefix: backstage_demo_ 
       auth:
         environment: development
         providers:

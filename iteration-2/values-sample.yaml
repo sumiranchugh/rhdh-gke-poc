@@ -48,6 +48,10 @@ upstream:
     podSecurityContext:
       # you can assign any random value as fsGroup
       fsGroup: 2000
+    resources:
+      requests:
+        cpu: 2
+        memory: 4Gi   
     appConfig:
       backend:
         https:
@@ -72,7 +76,7 @@ upstream:
       httpGet:
         scheme: HTTPS
     extraEnvVarsSecrets:
-      - tls-secret        
+      - tls-secret          
     extraEnvVars:
     - name: GLOBAL_AGENT_HTTP_PROXY
       value: "http://10.192.0.25:80"   

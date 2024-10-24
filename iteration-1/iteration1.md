@@ -35,7 +35,7 @@ gcloud container clusters get-credentials autopilot-cluster-1 --location austral
 Add GSA
 
 ```
-gcloud iam service-accounts create devhub-gsa \
+gcloud iam service-accounts create rhdh-gsa \
     --project=openenv-gzl5j
 ```    
 

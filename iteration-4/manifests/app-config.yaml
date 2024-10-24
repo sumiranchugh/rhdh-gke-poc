@@ -69,7 +69,7 @@ data:
         '/developer-hub':
           target: https://raw.githubusercontent.com/
           pathRewrite:
-            '^/api/proxy/developer-hub': /sumiranchugh/rhdh-gke-poc/refs/heads/main/iteration-4/manifests/data.json
+            '^/api/proxy/developer-hub': /sumiranchugh/rhdh-gke-poc/refs/heads/main/iteration-4/homepage/data.json
           changeOrigin: true
           secure: false    
     

@@ -40,7 +40,11 @@ upstream:
         scheme: HTTPS 
     readinessProbe:
       httpGet:
-        scheme: HTTPS     
+        scheme: HTTPS
+    resources:
+      requests:
+        cpu: 2
+        memory: 4Gi            
     appConfig:
       backend:
         https:
