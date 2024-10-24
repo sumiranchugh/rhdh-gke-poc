@@ -12,12 +12,6 @@ global:
     includes:
       - dynamic-plugins.default.yaml
   plugins:
-    - package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-dynamic
-      disabled: true
-    - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes
-      disabled: true        
-    - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes-backend-dynamic
-      disabled: true  
     - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-rbac
       disabled: false
     - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-topology
@@ -32,11 +26,18 @@ upstream:
     create: true
     annotations:
       iam.gke.io/gcp-service-account: 'rhdh-gsa@openenv-gzl5j.iam.gserviceaccount.com'
+  service:
+    ports:
+      backend: 443
+    type: LoadBalancer
+    externalTrafficPolicy: Local
+    annotations: 
+      cloud.google.com/l4-rbs: "enabled"      
   ingress:
-    enabled: true
+    enabled: false
     annotations:
       kubernetes.io/ingress.class: gce
-      networking.gke.io/managed-certificates: rhdh-cert
+      networking.gke.io/managed-certificates: "rhdh-cert" 
   backstage:      
     image:
       pullSecrets:
@@ -48,8 +49,11 @@ upstream:
       # you can assign any random value as fsGroup
       fsGroup: 2000
     appConfig:
-      # backend:
-      #   https: false
+      backend:
+        https:
+          certificate:
+            key: ${BACKSTAGE_SSL_KEY} # key in pem format 
+            cert: ${BACKSTAGE_SSL_CERT} # cert in pem format   
       auth:
         environment: development
         providers:
@@ -60,7 +64,36 @@ upstream:
         publisher:
           type: 'googleGcs'
           googleGcs:
-            bucketName: 'rhdh-bucket'             
+            bucketName: 'rhdh-bucket'
+    livenessProbe:
+      httpGet:
+        scheme: HTTPS 
+    readinessProbe:
+      httpGet:
+        scheme: HTTPS
+    extraEnvVarsSecrets:
+      - tls-secret        
+    extraEnvVars:
+    - name: GLOBAL_AGENT_HTTP_PROXY
+      value: "http://10.192.0.25:80"   
+    - name: NO_PROXY
+      value: "169.254.169.254,*.githubusercontent.com,localhost,127.0.0.1,*.googleapis.com"
+    - name: LOG_LEVEL
+      value: debug
+    - name: TZ
+      value: "Australia/Melbourne"
+    - name: NODE_TLS_REJECT_UNAUTHORIZED
+      value: '0'
+    - name: BACKEND_SECRET
+      valueFrom:
+        secretKeyRef:
+          key: backend-secret
+          name: rhdh-auth
+    - name: POSTGRESQL_ADMIN_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: postgres-password
+          name: rhdh-postgresql                               
   postgresql:
     primary:
       podSecurityContext:

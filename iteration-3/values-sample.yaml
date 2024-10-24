@@ -26,9 +26,6 @@ global:
         disabled: false
       - package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-github-pull-requests
         disabled: false
-
-          
-                    
 route:
   enabled: false
 upstream:
@@ -44,7 +41,7 @@ upstream:
     name: devhub-sa
     create: true
     annotations:
-      iam.gke.io/gcp-service-account: rhdh-gsa@openenv-b4g6h.iam.gserviceaccount.com
+      iam.gke.io/gcp-service-account: rhdh-gsa@openenv-gzl5j.iam.gserviceaccount.com
   ingress:
     enabled: false
     annotations:

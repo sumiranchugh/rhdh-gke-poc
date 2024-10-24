@@ -4,19 +4,28 @@ metadata:
   name: conditional-policy
 data:
   conditional-policy.yaml: |
-        ---
-        result: CONDITIONAL
-        roleEntityRef: 'role:default/test'
-        pluginId: catalog
-        permissionMapping:
-        - read
-        - update
-        resourceType: catalog-entity
-
-        conditions:
-          rule: IS_ENTITY_OWNER
-          resourceType: catalog-entity
-          params:
-            claims:
-            - 'group:default/teama'
-            - 'group:default/teamb'
+    { 
+      "roleEntityRef": "role:default/user",
+      "result": "CONDITIONAL",
+      "pluginId": "catalog",
+      "resourceType": "catalog-entity",
+      "permissionMapping": ["read"],
+      conditions: {
+        "anyOf": [
+          {
+            "rule": "IS_ENTITY_OWNER",
+            "resourceType": "catalog-entity",
+            "params": {
+              "claims": ["group:default/team-a"]
+            }
+          },
+          {
+            "rule": "IS_ENTITY_KIND",
+            "resourceType": "catalog-entity",
+            "params": {
+              "kinds": ["Group"]
+            }
+          }
+        ]
+      }
+    }

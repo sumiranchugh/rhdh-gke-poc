@@ -8,24 +8,8 @@ data:
     app:
       title: Sandbox
       baseUrl: https://rhdh.zapto.org
-    backend:
-      auth:
-        keys:
-          - secret: ${BACKEND_SECRET}
-      baseUrl: https://rhdh.zapto.org
       cors:
-        origin: https://rhdh.zapto.org
-    integrations:
-      github:
-        - host: github.com
-          apps:
-            - appId: ${GITHUB_APP_APP_ID}
-              clientId: ${GITHUB_APP_CLIENT_ID}
-              clientSecret: ${GITHUB_APP_CLIENT_SECRET}
-              webhookUrl: ${GITHUB_APP_WEBHOOK_URL}
-              webhookSecret: ${GITHUB_APP_WEBHOOK_SECRET}
-              privateKey: |
-                ${GITHUB_APP_PRIVATE_KEY}                  
+        origin: https://rhdh.zapto.org                 
     auth:
       environment: production
       providers:
@@ -33,11 +17,7 @@ data:
           production:
             clientId: ${AZURE_CLIENT_ID}
             clientSecret: ${AZURE_CLIENT_SECRET}
-            tenantId: ${AZURE_TENANT_ID}
-        github:
-          production:
-            clientId: ${GITHUB_APP_CLIENT_ID}
-            clientSecret: ${GITHUB_APP_CLIENT_SECRET}    
+            tenantId: ${AZURE_TENANT_ID} 
     signInPage: microsoft
     scaffolder:
       defaultAuthor:
@@ -51,25 +31,14 @@ data:
             clientId: ${AZURE_CLIENT_ID}
             clientSecret: ${AZURE_CLIENT_SECRET}
             tenantId: ${AZURE_TENANT_ID}
+            # user:
+            #   filter: accountEnabled eq true and userType eq 'member'
             userGroupMember:
               search: '"displayName:team a" OR "displayName:teamb"'
+              # filter: 'startswith(displayName,''team a'') or startswith(displayName,''teamb'')'
             schedule:
               frequency: PT1M
-              timeout: PT50M              
-        githubOrg:
-          id: production
-          githubUrl: https://github.com
-          orgs: [ "sumiran-default" ]
-        github:
-          providerId:
-            organization: 'sumiran-default'
-            schedule:
-              frequency:
-                hours: 10
-              initialDelay:
-                seconds: 15
-              timeout:
-                minutes: 3              
+              timeout: PT50M                          
     permission:
       enabled: true 
       rbac:
@@ -89,30 +58,12 @@ data:
       permission: false
       kubernetes: true
       techdocs: true
-      github: true
-      githubOrg: true
     techdocs:
-      builder: external
+      #builder: external
       publisher:
         type: 'googleGcs'
         googleGcs:
-          bucketName: 'devhub-bucket'
-    kubernetes:
-      serviceLocatorMethod:
-        type: 'singleTenant'
-      clusterLocatorMethods:  
-        - type: 'gke'
-          projectId: 'openenv-b4g6h'
-          exposeDashboard: true 
-          authProvider: googleServiceAccount
-    argocd:
-      appLocatorMethods:
-        - type: 'config'
-          instances:
-            - name: argoInstance1
-              url: https://proxy-rhdh.zapto.org
-              username: ${ARGOCD_USERNAME}
-              password: ${ARGOCD_PASSWORD}          
+          bucketName: 'rhdh-bucket'     
     proxy:
       endpoints:
         '/developer-hub':

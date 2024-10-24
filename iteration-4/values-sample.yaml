@@ -5,19 +5,7 @@ global:
   dynamic:
     includes:
       - dynamic-plugins.default.yaml
-    plugins:
-      - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes
-        disabled: false        
-      - package: ./dynamic-plugins/dist/backstage-plugin-kubernetes-backend-dynamic
-        disabled: false 
-      - package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-argo-cd-backend-dynamic
-        disabled: false
-      # - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-argocd
-      #   disabled: false
-      - package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-argo-cd
-        disabled: false
-      - package: 	./dynamic-plugins/dist/roadiehq-scaffolder-backend-argocd-dynamic
-        disabled: false         
+    plugins:       
       - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-rbac
         disabled: false
       - package: ./dynamic-plugins/dist/janus-idp-backstage-plugin-topology
@@ -26,25 +14,19 @@ global:
         disabled: false 
       - package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-msgraph-dynamic
         disabled: false
-      - disabled: false
-        package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-dynamic
-      - disabled: false
-        package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-org-dynamic 
-      - disabled: false
-        package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-github-dynamic
-      - disabled: false
-        package: ./dynamic-plugins/dist/roadiehq-backstage-plugin-github-pull-requests
-
-
-          
-                    
+      - package: ./dynamic-plugins/dist/backstage-plugin-catalog-backend-module-github-dynamic
+        disabled: true
+      - package: ./dynamic-plugins/dist/backstage-plugin-scaffolder-backend-module-github-dynamic
+        disabled: true
+      
 route:
   enabled: false
-  
 upstream:
-  postgresql:
-    enabled: false
-
+  serviceAccount: 
+    name: 'devhub-sa'
+    create: true
+    annotations:
+      iam.gke.io/gcp-service-account: 'rhdh-gsa@openenv-gzl5j.iam.gserviceaccount.com'
   service:
     ports:
       backend: 443
@@ -52,22 +34,43 @@ upstream:
     externalTrafficPolicy: Local
     annotations: 
       cloud.google.com/l4-rbs: "enabled"
-    #   cloud.google.com/neg: '{"exposed_ports": {"7007":{"name": "neg"}}}'
-  serviceAccount: 
-    name: devhub-sa
-    create: true
+      networking.gke.io/managed-certificates: "rhdh-cert"      
+  ingress:
+    enabled: false
     annotations:
-      iam.gke.io/gcp-service-account: rhdh-gsa@openenv-h62xq.iam.gserviceaccount.com                     
-  backstage:
+      kubernetes.io/ingress.class: gce
+      networking.gke.io/managed-certificates: "rhdh-cert"
+  postgresql:
+    enabled: false                    
+  backstage:      
+    image:
+      pullSecrets:
+      - rhdh-pull-secret
+      registry: registry.redhat.io #optional
+      repository: rhdh/rhdh-hub-rhel9 #optional
+      tag: "1.3" #optional
+    podSecurityContext:
+      # you can assign any random value as fsGroup
+      fsGroup: 2000
+    resources:
+      requests:
+        cpu: 2
+        memory: 4Gi  
+    livenessProbe:
+      httpGet:
+        scheme: HTTPS 
+    readinessProbe:
+      httpGet:
+        scheme: HTTPS             
     appConfig:
       backend:
-        https: true
-          # certificate:
-          #   key: ${BACKSTAGE_SSL_KEY} # key in pem format 
-          #   cert: ${BACKSTAGE_SSL_CERT} # cert in pem format 
+        https: 
+          certificate:
+            key: ${BACKSTAGE_SSL_KEY} # key in pem format 
+            cert: ${BACKSTAGE_SSL_CERT} # cert in pem format 
         database:
           client: pg
-          # ensureExists: true
+          # ensureExists: false
           # pluginDivisionMode: 'schema'
           # knexConfig:
           #   searchPath: ['knex', 'public']
@@ -76,56 +79,32 @@ upstream:
             port: '5432'
             user: ${DB_USER}
             password: ${DB_PASSWORD}
-          prefix: devhub_plugin_   
-    image:
-      pullPolicy: IfNotPresent
-      pullSecrets:
-      - rhdh-pull-secret
-      registry: quay.io #optional
-      repository: rhdh/rhdh-hub-rhel9 #optional
-      tag: "1.3" #optional
-    podSecurityContext:
-      # you can assign any random value as fsGroup
-      fsGroup: 2000    
+          prefix: devhub_plugin_ 
     extraAppConfig:
       - configMapRef: app-config-rhdh
-        filename: app-config-rhdh.yaml 
-    extraEnvVarsSecrets:
-      - rhdh-secret        
+        filename: app-config-rhdh.yaml
     extraEnvVars:
-      - name: LOG_LEVEL
-        value: debug
-      - name: TZ
-        value: "Australia/Melbourne"
-      # - name: HTTPS_PROXY
-      #   value: https://10.0.0.9  
-      # - name: GLOBAL_AGENT_HTTP_PROXY
-      #   value: http://10.0.0.9         
-      # - name: GLOBAL_AGENT_NO_PROXY
-      #   value: localhost
-      # - name: GLOBAL_AGENT_HTTPS_PROXY
-      #   value: https://10.0.0.9           
-      # - name: POSTGRESQL_ADMIN_PASSWORD
-      #   valueFrom:
-      #     secretKeyRef:
-      #       key: postgres-password
-      #       name: rhdh-postgresql   
-    livenessProbe:
-      httpGet:
-        scheme: HTTPS 
-    readinessProbe:
-      httpGet:
-        scheme: HTTPS
-    extraContainers:
-      - name: cloud-sql-proxy
-        image: gcr.io/cloud-sql-connectors/cloud-sql-proxy
-        args:
-          - "--structured-logs"
-          - "--port=5432"
-          - "openenv-h62xq:australia-southeast2:devhub"
-          - "--private-ip"
-        securityContext:
-          runAsNonRoot: true
+    - name: GLOBAL_AGENT_HTTPS_PROXY
+      value: "http://10.192.0.25:80"
+    - name: HTTPS_PROXY
+      value: "http://10.192.0.25:80"
+    - name: GLOBAL_AGENT_HTTP_PROXY
+      value: "http://10.192.0.25:80"
+    - name: HTTP_PROXY
+      value: "http://10.192.0.25:80" 
+    - name: GLOBAL_AGENT_NO_PROXY
+      value: "169.254.169.254,.githubusercontent.com,localhost,127.0.0.1,.googleapis.com,.github.com,rhdh.zapto.org"                 
+    - name: NO_PROXY
+      value: "169.254.169.254,.githubusercontent.com,localhost,127.0.0.1,.googleapis.com,.github.com,rhdh.zapto.org"
+    - name: LOG_LEVEL
+      value: debug
+    - name: TZ
+      value: "Australia/Melbourne"
+    - name: NODE_TLS_REJECT_UNAUTHORIZED
+      value: '0'
+    extraEnvVarsSecrets:
+      - rhdh-secret
+      - tls-secret                 
     extraVolumeMounts:
       - mountPath: /opt/app-root/src/rbac-policy.csv
         subPath: rbac-policy.csv
@@ -179,3 +158,13 @@ upstream:
         # - name: backstage-app-config
         #   configMap:
         #     name: rhdh-developer-hub-app-config
+    extraContainers:
+      - name: cloud-sql-proxy
+        image: gcr.io/cloud-sql-connectors/cloud-sql-proxy
+        args:
+          - "--structured-logs"
+          - "--port=5432"
+          - "openenv-gzl5j:australia-southeast2:devhub"
+          - "--private-ip"
+        securityContext:
+          runAsNonRoot: true    
