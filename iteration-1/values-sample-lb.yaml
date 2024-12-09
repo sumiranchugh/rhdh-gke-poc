@@ -1,0 +1,51 @@
+global:
+  host: rhdh.zapto.org
+route:
+  enabled: false
+upstream: 
+  service:
+    ports:
+      backend: 443
+    type: LoadBalancer
+    externalTrafficPolicy: Local
+    annotations: 
+      cloud.google.com/l4-rbs: "enabled"             
+  backstage:
+    extraEnvVarsSecrets:
+      - tls-secret 
+    livenessProbe:
+      httpGet:
+        scheme: HTTPS 
+    readinessProbe:
+      httpGet:
+        scheme: HTTPS
+    resources:
+      requests:
+        cpu: 2
+        memory: 4Gi            
+    appConfig:
+      backend:
+        https:
+          certificate:
+            key: ${BACKSTAGE_SSL_KEY} # key in pem format 
+            cert: ${BACKSTAGE_SSL_CERT} # cert in pem format   
+      auth:
+        environment: development
+        providers:
+          guest:
+            dangerouslyAllowOutsideDevelopment: true      
+    image:
+      pullSecrets:
+      - rhdh-pull-secret
+      registry: registry.redhat.io #optional
+      repository: rhdh/rhdh-hub-rhel9 #optional
+      tag: "1.3" #optional
+    podSecurityContext:
+      # you can assign any random value as fsGroup
+      fsGroup: 2000
+  postgresql:
+    primary:
+      podSecurityContext:
+        enabled: true
+        # you can assign any random value as fsGroup
+        fsGroup: 3000

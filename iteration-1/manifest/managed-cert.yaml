@@ -5,4 +5,4 @@ metadata:
   namespace: rhdh-gke
 spec:
   domains:
-    - rhdh.zapto.org
+    - rhdh-lab.zapto.org

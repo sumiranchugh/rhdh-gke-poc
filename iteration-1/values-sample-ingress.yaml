@@ -1,0 +1,46 @@
+global:
+  host: rhdh-lab.zapto.org
+route:
+  enabled: false
+upstream: 
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: gce
+      networking.gke.io/managed-certificates: "rhdh-cert" 
+  backstage:
+    resources:
+      requests:
+        cpu: 2
+        memory: 4Gi            
+    appConfig:
+      auth:
+        environment: development
+        providers:
+          guest:
+            dangerouslyAllowOutsideDevelopment: true
+    podSecurityContext:
+      # you can assign any random value as fsGroup
+      fsGroup: 2000
+    extraEnvVars:
+      - name: NODE_TLS_REJECT_UNAUTHORIZED
+        value: '0'
+      - name: BACKEND_SECRET
+        valueFrom:
+          secretKeyRef:
+            key: backend-secret
+            name: rhdh-auth
+      - name: POSTGRESQL_ADMIN_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            key: postgres-password
+            name: rhdh-postgresql
+  global:  
+    imagePullSecrets:
+      - rhdh-pull-secret
+  postgresql:
+    primary:
+      podSecurityContext:
+        enabled: true
+        # you can assign any random value as fsGroup
+        fsGroup: 3000
