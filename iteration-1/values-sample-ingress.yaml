@@ -1,5 +1,7 @@
 global:
-  host: rhdh-lab.zapto.org
+  host: <dns>
+  imagePullSecrets:
+    - rhdh-pull-secret
 route:
   enabled: false
 upstream: 
@@ -22,9 +24,6 @@ upstream:
     podSecurityContext:
       # you can assign any random value as fsGroup
       fsGroup: 2000
-  global:  
-    imagePullSecrets:
-      - rhdh-pull-secret
   postgresql:
     primary:
       podSecurityContext:

@@ -1,5 +1,7 @@
 global:
-  host: rhdh.zapto.org
+  host: <dns>
+  imagePullSecrets:
+    - rhdh-pull-secret
 route:
   enabled: false
 upstream: 
@@ -27,19 +29,13 @@ upstream:
       backend:
         https:
           certificate:
-            key: ${BACKSTAGE_SSL_KEY} # key in pem format 
-            cert: ${BACKSTAGE_SSL_CERT} # cert in pem format   
+            key: <BACKSTAGE_SSL_KEY> # key in pem format 
+            cert: <BACKSTAGE_SSL_CERT> # cert in pem format   
       auth:
         environment: development
         providers:
           guest:
             dangerouslyAllowOutsideDevelopment: true      
-    image:
-      pullSecrets:
-      - rhdh-pull-secret
-      registry: registry.redhat.io #optional
-      repository: rhdh/rhdh-hub-rhel9 #optional
-      tag: "1.3" #optional
     podSecurityContext:
       # you can assign any random value as fsGroup
       fsGroup: 2000
